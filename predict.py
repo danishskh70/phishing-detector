@@ -1,35 +1,47 @@
 import sys
-import torch
 import joblib
+import torch
 
 # -----------------------------
 # Load model
 # -----------------------------
-tokenizer, model, clf = joblib.load("model/phishing_detector.pkl")
+tokenizer, bert_model, clf = joblib.load("model/phishing_detector.pkl")
 
 # -----------------------------
-# Input email text
+# Get email input
 # -----------------------------
-email_text = sys.argv[1] if len(sys.argv) > 1 else input("Enter email text: ")
+if len(sys.argv) < 2:
+    print("Usage: python predict.py '<subject> | <body>'")
+    sys.exit(1)
 
-# -----------------------------
-# Generate embedding
-# -----------------------------
-inputs = tokenizer(email_text, return_tensors="pt", truncation=True, padding=True, max_length=128)
-with torch.no_grad():
-    outputs = model(**inputs)
-    cls_emb = outputs.last_hidden_state[:,0,:].squeeze().numpy()
+input_text = sys.argv[1]
+if "|" in input_text:
+    subject, body = map(str.strip, input_text.split("|",1))
+else:
+    subject, body = "", input_text
+
+email_text = subject + " " + body
 
 # -----------------------------
 # Predict
 # -----------------------------
-prediction = clf.predict([cls_emb])[0]
-probability = clf.predict_proba([cls_emb])[0]
+inputs = tokenizer([email_text], return_tensors='pt', truncation=True, padding=True, max_length=128)
+with torch.no_grad():
+    outputs = bert_model(**inputs)
+emb = outputs.last_hidden_state[:,0,:].numpy()  # CLS token
 
-label = "PHISHING 🚨 (High Risk)" if prediction==1 else "SAFE ✅"
-confidence = max(probability) * 100
+pred = clf.predict(emb)[0]
+prob = clf.predict_proba(emb)[0]
+conf = max(prob) * 100
+
+if conf < 40:
+    label = "SAFE ✅"
+elif conf < 70:
+    label = "SUSPICIOUS ⚠️ (Review Recommended)"
+else:
+    label = "PHISHING 🚨 (High Risk)"
 
 print("\nResult:")
 print("------")
 print(f"Verdict   : {label}")
-print(f"Confidence: {confidence:.2f}%")
+print(f"Confidence: {conf:.2f}%")
