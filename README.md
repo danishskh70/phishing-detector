@@ -101,9 +101,3 @@ The dataset CSV must contain at least two columns:
 - Add simple web interface
 - Add LLM-based explanation (optional)
 
-## Purpose
-This project is built for:
-- Learning applied machine learning
-- Demonstrating phishing detection logic
-- Resume and portfolio use
-- Understanding real-world NLP pipelines
