@@ -3,8 +3,8 @@ This project is a simple command-line tool that analyzes email text and predicts
 # AI Powered Phishing Email Detector
 
 ## Overview
-This project is a simple command-line tool that analyzes email text and predicts whether the email is Phishing, Suspicious, or Legitimate.  
-The goal of the project is to demonstrate how machine learning and modern NLP embeddings can be used to detect phishing emails in a practical, lightweight, and explainable way.
+A command-line tool that analyzes email text and predicts whether an email is Phishing, Suspicious, or Legitimate.
+This project demonstrates how machine learning and modern NLP embeddings can be used to detect phishing emails in a practical, lightweight, and explainable way.
 
 ## What This Project Does
 - Takes raw email text as input
@@ -37,24 +37,38 @@ The classifier itself remains simple (Logistic Regression) to keep the system:
 ## Project Structure
 ```
 phishing-detector/
-│
 ├── data/
 │   └── emails/
-│       └── combined.csv (dataset with text and labels)
-│
+│       └── combined.csv  # Dataset with email text & labels
 ├── model/
-│   └── phishing_model.pkl (saved tokenizer + BERT + classifier)
-│
-├── train.py (training script)
-├── test.py (CLI testing script)
+│   └── phishing_model.pkl  # Trained DistilBERT + Logistic Regression
+├── train.py  # Training script
+├── test.py   # CLI testing script
+├── requirements.txt  # Python dependencies
 └── README.md
-```
 
+```
+## Python environment setup
+
+```
+# Install dependencies
+python -m venv venv
+venv\Scripts\activate      # Windows
+
+pip install -r requirements.txt
+
+```
 ## Dataset Format
 The dataset CSV must contain at least two columns:  
 - `text` → email content  
 - `label` → 1 for phishing, 0 for legitimate
+## sample dataset
+```
+text,label
+"Please verify your account immediately",1
+"Team meeting at 5 PM today",0
 
+```
 ## How Training Works
 1. Load phishing email dataset
 2. Tokenize emails using DistilBERT tokenizer
@@ -88,6 +102,15 @@ The dataset CSV must contain at least two columns:
    ```
    python test.py
    ```
+## Model Evaluation Section
+```
+# Model Performance (Example)
+Accuracy: 96.4%
+Precision: 95.1%
+Recall: 97.2%
+F1-score: 96.1%
+
+```
 
 ## Limitations
 - Model is only as good as the dataset
